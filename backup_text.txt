@@ -1,0 +1,248 @@
+Calculatorul: negru
+Cel care compileaza jocul: alb
+
+
+Strategie. Se aplica in ordine:
+
+
+      0.  Daca coloana pionului este libera si safe (ferita de orice atac din coloanele vecine adica coloane j-1 si j+1 sunt libere de pioni adversi de la linia i+1 (cum apare in matrice nu cum se vede pe strada) incolo 
+Daca poti manca orice pion - fa-o  (daca sunt mai multi se alege random, liste possible_attackers, si possible_safe_attackers - vezi mai jos la Strategia 1)
+Daca nu poti manca un pion, atunci daca vreun pion este atacat protejeaza-l (daca sunt mai multi pioni atacati ce pot fi protejati, alege random unu din ei) mutand un alt pion care sa il protejeze sau mutand pionul in fata pe o celula safe
+     2.	Daca niciun pion nu poate fi mancat si niciun pion nu poate fi protejat, atunci incearca sa plasezi pionii in formatie zig zag [cu alte cuvinte : daca un pion poate fi protejat, chiar daca nu e atacat, fa asta, altfel muta in fata un pion
+     3. Avanseaza si incearca sa mentii pe cat posibil formatia de zig-zag. 
+
+
+Ce inseamna:
+protejare pion a[i][j] : adica sa aduci un alt pion pe o coloana invecinata pe linia i - 1: 
+muta pion de pe j-1 sau j+1 pe : a[i-1][j-1] sau a[i-1][j+1] sau sa muti pe [i
+sa mananci un pion advers de pe a[i][j] : adica sa ai un pion al tau pe a[i-1][j-1] sau a[i-1][j+1] sau (mutare en passant) :
+	daca tu ai un pion pe linia 4 coloana j si adversarul muta un pion 2 pozitii odata si ajunge pe coloana j-1 sau j+1 , atunci tu poti sa il mananci trecand pe linia 3(5 in matrice) si coloana pionului advers(j-1 sau j+1)	
+
+
+
+
+Mutare valida(linieFrom,coloanaFrom,linieTo,coloanaTo, culoare):
+           if abs(coloanaTo-coloanaFrom) > 2 return false
+           Daca linieTo, coloanaTo nu se incadreaza in harta return false 
+	Daca e pe linia 7 sau 2, are voie sa mearga in fata cu 1 sau 2 pozitii(pe o celula libera si atentie, daca se incerca mutarea a 2 pozitii odata, atat celula de pe i+2 cat si celula de pe i+1 trebuie sa fie libera)
+	Are voie sa mearga pe diagonala daca poate manca pe adversar.
+           De pe orice linie, poate avansa un patratel daca e liber acel patratel.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Atentie! Inainte de orice mutare din strategii, sa verifici daca mutarea este una valida.
+Dupa orice mutare sa actualizezi listele pentru piesele albe si cele negre.
+Strategia 0:
+	Daca este pe coloana j, iar coloanele j-1 si j+1 (cele care se incadreaza in harta) sunt libere, avanseaza. Prima piesa libera gasita va fi prima care va avansa.
+
+
+
+
+Strategia 1:
+	Daca exista o mutare facuta de alb cu 2 pozitii, fie: [i][j] => [i-2][j], vezi daca daca pe pozitiile [i-2][j-1], [i-2][j+1] exista un pion negru. Daca exista un pion negru, atunci muta pionul negru pe pozitiile [i+1][j] si pionul alb de pe pozitiile [i+2][j] este scos din joc, Returneaza True; 
+	Pentru fiecare pion, vezi daca pe diagonala, [i+1][j+1], [i+1][j-1], (bineinteles, i+1,j+1.j-1 sa se incadreze in harta), se afla un pion advers. Daca da, stocheaza configuratia pionului care poate ataca intr-o lista temporara de pair-uri numita possible_attackers.
+ Dupa ce ai parcurs toti pionii in viata, daca lista possible_attackers este nevida, creaza o noua lista numita possible_safe_attackers, care va retine pionii negri care pot ataca, insa dupa atac se vor plasa intr-o celula safe, adica intr-o celula care sa nu poata fi atacata de un pion alb.              Daca possible_safe_attackers este nevida, alege random un pion din possible_safe_attackers, altfel, alege random un pion din possible_attackers. 
+
+
+Vezi din nou care pioni poate sa atace pionul ales random ( ataca si actualizeaza lista care stocheaza coordonatele pionilor de culoarea adversaruluia alb. 
+	Daca se poate ataca ceva, fie safe, fie nu, se va returna True, altfel, False.
+
+
+Stragegia 2 - Zig Zag ( Vom alege ca pe coloanele impare sa avansam in zig-zag):, vom muta piesa de pe linia minima care are un vecin pe acceasi linie si se afla pe o coloana impara.
+	
+
+
+Strategia 3: 
+Daca niciuna din strategiile de mai sus nu a fost aplicata (inseamna ca suntem in formatie perfecta zig-zag sau fie ca pionii sunt rasfirati fie ca orice pion este aparat de un altul. atunci vom alege minimul dintre liniile ocupate de pioni, si din acea linie vom alege un pion random. Daca linia minima este linia 2, (adica linia de start pentru negru), atunci vom vom face 2 mutari in fata, pentru a avea un zig zag partial, altfel, vom face o mutare in fata, fie ca e pozitie periculoasa, fie ca nu (trebuie candva sa atace si calculatorul).	
+
+
+Configuratii de incarcat:
+	1.Cand are drum liber in fata si nu il opreste nimeni
+	2.Cand poti sa ii mananci un singur pion si daca faci asta ramane singur pe coloana
+	3.Cand ai 2 pioni atacati si o sa aleaga random unul din ei
+	4.Cand faci mutarea en passant si calculatorul iti mananca piesa
+
+
+---------------------------------------------------------------------------------------------------------------------------
+Tema 2 - Teoria jocurilor
+	-jocul de sah limitat la a muta doar pionii
+	-aceleasi reguli cu cele din sah 
+	-jocul se finalizeaza cand se ajunge pe linia finala 
+	
+1.Reprezentarea starilor
+2.Identificare stari reprezentative
+	-stare initiala - una singura 
+	-stari finale (mai multe)
+	-stari intermediare care au relevanta strategica 
+3.Tranzitii
+	-tranzitarea pe baza regulilor jocului (pionilor) (incadrarea pe harta jocului etc)
+4.Strategia
+	-stilul nostru personal de rezolvare 
+
+
+Altele:
+Sa se poata trece usor de la acest joc la alt joc  - sa lucram modularizat 
+Primul aspect de atins sa fie cel de a nu permite unui jucator sa incalce regulile 
+Ar vrea sa includem conditii ca sa nu forteze pe unul sa iasa in afara tablei + alte aspecte 
+Reprezentarea starilor:
+	- 8 piese albe
+	- 8 piese negre 
+	- pentru fiecare piesa, in loc sa avem o matrice de 8 x 8 , putem reprezenta binar ? 
+	- reprezentam cum vrem noi 
+	- stari finale : mai multe stari finale :
+		-in care eu castig 
+		-in care castiga calculatorul
+		-remiza (piesele sunt fata in fata)
+Din strategia aleasa, doar jumatate din joc il controlam noi :
+	- putem stabili drumul de la starea initiala la finala in doar jumatate de joc, deoarece cealalta jumatate e aleasa de calculator 
+	- scopul final e ca strategia noastra sa castige sau in cel mai rau caz, sa duca la remiza 
+	- e un joc interactiv intre noi si calculator 
+Daca avem 8 pioni, la urmatoarea tranzitie sa avem minim 8 tranzitii ( de fapt pot fi si mai multe)
+Ex de strategii:
+	-Strategia ofensiva
+	-Strategia defensiva 
+	#Sa alegem random din strategii 
+	-Trebuie sa avem minim 2 strategii 
+Teoria echilibrului:
+	-se bazeaza pe faptul ca toti jucatorii respecta regulile jocului si niciunul nu incearca decat sa isi maximizeze profitul 
+	-strategii de maximizare profit 
+	-strategie eficienta pentru un maxim global 
+	-sa ne uitam in documentatia profului 
+De incercat o strategie de tip min-max:
+	-prevede ca cea mai buna mutare este cea care minimizeaza avantajului adversarului 
+	-avem un arbore intreg in care trebuie sa gandim in avans miscarile 
+	
+Pentru punctaj maxim:
+	-sa avem 2 posibilitati de a porni jocul:
+		- pune pionii pe a doua si penultima linie  
+		- citim configuratia dintr-un fisier txt 
+		- nu va fi  timp sa stea la fiecare 
+		- vrea ca la inceput de joc sa fie ori situatia cu a doua si penultima, fie sa se poata citi o stare 
+	-ca si stari, se doresc urmatoarele:
+		- starea in care stie sa manance intr-un ampasant - demonstrat doar incarcand fisierul respectiv  
+		- starea care sa fie incarcata si in care calculatorul are o piesa care are drum liber spre a fi finalizat jocului si sa vada proful ca piesa asta libera
+		merge tot in fata pana se termina jocul: deci sa incarcam o astfel de stare si sa vada cum pionulul ala liber tot merge in fata pana la finalizarea jocului
+        - sa putem incarca anumite stari sa vada proful cum am gandit strategia 
+    - vrea sa vada cum am definit tranzitiile 
+	- vrea sa ii explicam strategia elaborata 
+	- cea mai eficienta : random , random-ul trebuie optimizat 
+	- la strategii, vrea neaparat sa avem minim 2, el ar vrea 3 
+	- eu nu sunt mereu alb, culorile se pot schimba intre calculator si om ; la inceput fie stabilim random , 
+	
+--------------------------------------
+-tranzitie_valida
+-retinerea numarului de piese 
+-tranzitie ofensiva 
+	- se cauta piesele care pot fi atacate si se alege random una din ele 
+-tranzitie defensiva 
+	- se verifica daca exista o piesa atacata, atunci va fi mutata daca exista posibilitati 
+	
+-terminarea jocului: numarul de piese a unuia dintre jucatori 0 sau s-a ajuns pe linia 0 sau n 
+-alegerea culorilor 
+
+
+
+
+
+
+
+
+
+
+-----------------------------------------
+
+
+Configuratie pentru en passant: Ca si user sa muti de exemplu de la B7 la B5:
+
+
+00000000
+0N0N0NNN
+00N0N000
+00000000
+N0000000
+00A00000
+0A0AAAAA
+00000000
+
+
+-------------------------------------------
+
+
+Configuratie pentru a vedea ca mananca daca poate manca: Ca si user sa muti de la B7 la B6:
+
+
+00000000
+0N0N0NNN
+00N0N000
+00000000
+N0000000
+00A00000
+0A0AAAAA
+00000000
+
+
+--------------------------------------
+Configuratie pentru a vedea ca daca ii eliberez drumul el porneste tot in fata: Ca si user muti de la B7 la B6, apoi de la C6 la C5 si negru castiga jocul.
+
+
+00000000
+0N0N0NNN
+00N0N000
+00000000
+00000000
+N0N00000
+0A0AAAAA
+00000000
+
+
+-----------------------------------
+
+
+
+
+
+
+Configuratie pentru a arata ca daca are de ales dintre mai multe victime, daca are o pozitie safe dupa ce ataca, va alege acea pozitie safe si nu o pozitie care sa il faca vulnerabil.
+Ca si user, o sa fac mutarea G7 la G6, iar apoi voi vedea ca Negrul va muta de la C5 la B6, acesta fiind un atac safe.
+
+
+00000000
+0N0N0NNN
+00N0N000
+N0000000
+00N00000
+0A0A0000
+0000AAAA
+00000000
+------------------------------------
+Configuratie pentru a arata ca daca are ce ataca , dar nu e nicio pozitie safe, va alege random una din ele:
+Ca si user, o as fac mutarea G7 la G6, iar apoi voi vedea ca negrul se muta random pe o pozitie vulnerabila dupa ce mananca o piesa alba.
+
+
+00000000
+0N0N0NNN
+00N0N000
+N0000000
+00N00000
+0A0A0000
+A000AAAA
+00000000
+
+
+
+
+
+
+
+
